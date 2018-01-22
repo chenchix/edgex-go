@@ -1,64 +1,57 @@
-.PHONY: build test prepare docker
+# Copyright 2017 Cavium
+#
+# SPDX-License-Identifier: Apache-2.0
 
-DOCKERS=docker_export_client docker_export_distro docker_core_metadata docker_core_command docker_core_data
-.PHONY: $(DOCKERS)
+BUILD_DIR := build
 
-GO=CGO_ENABLED=0 go
-GOCGO=CGO_ENABLED=1 go
+.PHONY: buildall test vet prepare $(BUILD_DIR)/client $(BUILD_DIR)/distro \
+		$(BUILD_DIR)/distro_zmq docker
 
-EXPORT_CLIENT_VERSION=$(shell cat cmd/export-client/VERSION)
-EXPORT_DISTRO_VERSION=$(shell cat cmd/export-distro/VERSION)
-CORE_DATA_VERSION=$(shell cat cmd/core-data/VERSION)
-CORE_METADATA_VERSION=$(shell cat cmd/core-metadata/VERSION)
-CORE_COMMAND_VERSION=$(shell cat cmd/core-command/VERSION)
-SUPPORT_LOGGING_VERSION=$(shell cat cmd/support-logging/VERSION)
+# Make exec targets phony to not track changes in go files. Compilation is fast
+.PHONY: client distro distro_zmq
 
-MICROSERVICES=cmd/core-data/core-data cmd/core-metadata/core-metadata \
-	cmd/core-command/core-command cmd/export-client/export-client \
-	cmd/export-distro/export-distro cmd/support-logging/support-logging
-.PHONY: $(MICROSERVICES)
+default: buildall
 
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
 
-build: $(MICROSERVICES)
+client: $(BUILD_DIR)
+	go build -o $(BUILD_DIR)/client cmd/client/main.go
 
-cmd/core-data/core-data:
-	$(GOCGO) build -ldflags "-X main.version=$(CORE_DATA_VERSION)" -o cmd/core-data/core-data ./cmd/core-data
+distro: $(BUILD_DIR)
+	go build -o $(BUILD_DIR)/distro cmd/distro/main.go
 
-cmd/core-metadata/core-metadata:
-	$(GO) build -ldflags "-X main.version=$(CORE_METADATA_VERSION)" -o cmd/core-metadata/core-metadata ./cmd/core-metadata
+distro_zmq: $(BUILD_DIR)
+	go build -o $(BUILD_DIR)/distro_zmq -tags zeromq cmd/distro/main.go
 
-cmd/core-command/core-command:
-	$(GO) build -ldflags "-X main.version=$(CORE_COMMAND_VERSION)" -o cmd/core-command/core-command ./cmd/core-command
+buildall: client distro distro_zmq
 
-cmd/export-client/export-client:
-	$(GO) build -ldflags "-X main.version=$(EXPORT_CLIENT_VERSION)" -o cmd/export-client/export-client ./cmd/export-client
-
-cmd/export-distro/export-distro:
-	$(GOCGO) build -ldflags "-X main.version=$(EXPORT_DISTRO_VERSION)" -o cmd/export-distro/export-distro ./cmd/export-distro
-
-cmd/support-logging/support-logging:
-	$(GO) build -ldflags "-X main.version=$(SUPPORT_LOGGING_VERSION)" -o cmd/support-logging/support-logging ./cmd/support-logging
+docker:
+	docker build -f Dockerfile.client  .
+	docker build -f Dockerfile.distro  .
 
 test:
 	go test `glide novendor`
 
+vet:
+	go vet `glide novendor` 
+
+coverage: $(BUILD_DIR)
+	go test -covermode=count -coverprofile=$(BUILD_DIR)/cov.out ./distro
+	go tool cover -html=$(BUILD_DIR)/cov.out -o $(BUILD_DIR)/distroCoverage.html
+	go test -covermode=count -coverprofile=$(BUILD_DIR)/cov.out ./client
+	go tool cover -html=$(BUILD_DIR)/cov.out -o $(BUILD_DIR)/clientCoverage.html
+	rm $(BUILD_DIR)/cov.out
+
+bench: $(BUILD_DIR)
+	go test -run=XXX -bench=. ./distro
+
+profile: $(BUILD_DIR)
+	go test -run=XXX -bench=. -cpuprofile $(BUILD_DIR)/distro.cpu ./distro
+	go test -run=XXX -bench=. -memprofile $(BUILD_DIR)/distro.mem ./distro
+
 prepare:
 	glide install
 
-docker_export_client:
-	docker build -f docker/Dockerfile.client -t edgexfoundry/docker-export-client .
-
-docker_export_distro:
-	docker build -f docker/Dockerfile.distro -t edgexfoundry/docker-export-distro .
-
-docker_core_metadata:
-	docker build -f docker/Dockerfile.metadata -t edgexfoundry/docker-core-metadata .
-
-docker_core_command:
-	docker build -f docker/Dockerfile.command -t edgexfoundry/docker-core-command .
-
-docker_core_data:
-	docker build -f docker/Dockerfile.data -t edgexfoundry/docker-core-command .
-
-docker: $(DOCKERS)
-
+clean:
+	rm -rf $(BUILD_DIR) distro.test

@@ -14,8 +14,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/edgexfoundry/edgex-go/export"
-	"github.com/edgexfoundry/edgex-go/export/distro"
+	"github.com/edgexfoundry/core-domain-go/models"
+	"github.com/edgexfoundry/export-go/distro"
 
 	"go.uber.org/zap"
 )
@@ -25,9 +25,6 @@ const (
 	envDataHost   string = "EXPORT_DISTRO_DATA_HOST"
 )
 
-// Set from the makefile
-var version string = "undefined"
-
 var logger *zap.Logger
 
 func main() {
@@ -36,11 +33,11 @@ func main() {
 
 	distro.InitLogger(logger)
 
-	logger.Info("Starting export-distro", zap.String("version", version))
+	logger.Info("Starting distro")
 	cfg := loadConfig()
 
 	errs := make(chan error, 2)
-	eventCh := make(chan *export.Event, 10)
+	eventCh := make(chan *models.Event, 10)
 
 	go func() {
 		c := make(chan os.Signal)

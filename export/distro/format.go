@@ -10,7 +10,7 @@ import (
 	"encoding/json"
 	"encoding/xml"
 
-	"github.com/edgexfoundry/edgex-go/core/domain/models"
+	"github.com/edgexfoundry/core-domain-go/models"
 	"go.uber.org/zap"
 )
 

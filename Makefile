@@ -6,11 +6,13 @@ CORE_DATA_VERSION=$(shell cat cmd/core-data/VERSION)
 CORE_METADATA_VERSION=$(shell cat cmd/core-metadata/VERSION)
 CORE_COMMAND_VERSION=$(shell cat cmd/core-command/VERSION)
 
+DESTDIR?=`pwd`/release
+
 MICROSERVICES=cmd/core-data/core-data cmd/core-metadata/core-metadata \
 	cmd/core-command/core-command cmd/export-client/export-client \
 	cmd/export-distro/export-distro
-.PHONY: $(MICROSERVICES)
 
+.PHONY: $(MICROSERVICES)
 
 build: $(MICROSERVICES)
 
@@ -42,3 +44,18 @@ docker_export_distro:
 	docker build -f docker/Dockerfile.distro -t edgexfoundry/docker-export-distro .
 
 docker: docker_export_distro docker_export_client
+
+install:  
+	rm -rf $(DESTDIR)
+	mkdir -p $(DESTDIR)/config
+	$(foreach m,$(MICROSERVICES), \
+		mkdir -p $(DESTDIR)/`dirname $(m)`; \
+		cp $(m) $(DESTDIR)/`dirname $(m)`;\
+		if [ -d `dirname $(m)`/res/ ]; then \
+			mkdir -p $(DESTDIR)/`dirname $(m)`/res; \
+			cp -rf `dirname $(m)`/res/* $(DESTDIR)/`dirname $(m)`/res;  \
+		fi;		)
+
+	cp scripts/* $(DESTDIR)
+
+

@@ -47,7 +47,6 @@ docker: docker_export_distro docker_export_client
 
 install: 
 	rm -rf $(DESTDIR)
-	mkdir -p $(DESTDIR)/config
 	mkdir -p $(DESTDIR)/mongodb
 	mkdir -p $(DESTDIR)/mongodb/lib
 	mkdir -p $(DESTDIR)/mongodb/log
@@ -56,10 +55,9 @@ install:
 		mkdir -p $(DESTDIR)/`dirname $(m)`; \
 		cp $(m) $(DESTDIR)/`dirname $(m)`;\
 		if [ -d `dirname $(m)`/res/ ]; then \
-			mkdir -p $(DESTDIR)/`dirname $(m)`/res; \
-			cp -rf `dirname $(m)`/res/* $(DESTDIR)/`dirname $(m)`/res;  \
+			cp -rf `dirname $(m)`/res $(DESTDIR)/`dirname $(m)`/;  \
 		fi;		)
-
+	cp -rf config/ $(DESTDIR)/
 	cp scripts/* $(DESTDIR)
 
 

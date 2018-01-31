@@ -47,6 +47,7 @@ docker: docker_export_distro docker_export_client
 
 install: 
 	rm -rf $(DESTDIR)
+	mkdir -p $(DESTDIR)/config
 	mkdir -p $(DESTDIR)/mongodb
 	mkdir -p $(DESTDIR)/mongodb/lib
 	mkdir -p $(DESTDIR)/mongodb/log

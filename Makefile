@@ -45,9 +45,13 @@ docker_export_distro:
 
 docker: docker_export_distro docker_export_client
 
-install:  
+install: 
 	rm -rf $(DESTDIR)
 	mkdir -p $(DESTDIR)/config
+	mkdir -p $(DESTDIR)/mongodb
+	mkdir -p $(DESTDIR)/mongodb/lib
+	mkdir -p $(DESTDIR)/mongodb/log
+	
 	$(foreach m,$(MICROSERVICES), \
 		mkdir -p $(DESTDIR)/`dirname $(m)`; \
 		cp $(m) $(DESTDIR)/`dirname $(m)`;\

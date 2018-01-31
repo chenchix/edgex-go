@@ -6,6 +6,7 @@ function killit {
 }
 
 killit core-metadata
+killit mongod
 killit core-command
 killit core-data
 killit export-distro

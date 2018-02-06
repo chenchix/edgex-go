@@ -22,10 +22,15 @@ type mqttsSender struct {
 	topic  string
 }
 
+const (
+	MQTT_CERT = "certs/dummy.crt"
+	MQTT_KEY  = "certs/dummy.key"
+)
+
 // NewMqttsSender - create new mqtts sender
 func NewMqttsSender(addr export.Addressable) Sender {
 
-	cert, err := tls.LoadX509KeyPair("/home/sergiom/mosquitto_certs/mosq-serv.crt", "/home/sergiom/mosquitto_certs/mosq-serv.key")
+	cert, err := tls.LoadX509KeyPair(MQTT_CERT, MQTT_KEY)
 
 	if err != nil {
 		logger.Fatal("Failed loading x509 data")

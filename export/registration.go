@@ -30,6 +30,7 @@ const (
 // Export destination types
 const (
 	DestMQTT        = "MQTT_TOPIC"
+	DestMQTTS       = "MQTTS_TOPIC"
 	DestZMQ         = "ZMQ_TOPIC"
 	DestIotCoreMQTT = "IOTCORE_TOPIC"
 	DestAzureMQTT   = "AZURE_TOPIC"
@@ -86,6 +87,7 @@ func (reg *Registration) Validate() bool {
 	}
 
 	if reg.Destination != DestMQTT &&
+		reg.Destination != DestMQTTS &&
 		reg.Destination != DestZMQ &&
 		reg.Destination != DestIotCoreMQTT &&
 		reg.Destination != DestAzureMQTT &&

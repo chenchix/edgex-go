@@ -10,8 +10,6 @@ package distro
 
 import (
 	"crypto/tls"
-	"crypto/x509"
-	"io/ioutil"
 	"strconv"
 
 	MQTT "github.com/eclipse/paho.mqtt.golang"
@@ -24,36 +22,24 @@ type mqttsSender struct {
 	topic  string
 }
 
-// NewMqttSender - create new mqtt sender
+// NewMqttsSender - create new mqtts sender
 func NewMqttsSender(addr export.Addressable) Sender {
-	tlsConfig := new(tls.Config)
 
-	tlsConfig.ClientCAs = x509.NewCertPool()
-	tlsConfig.RootCAs = x509.NewCertPool()
+	cert, err := tls.LoadX509KeyPair("/home/sergiom/mosquitto_certs/mosq-serv.crt", "/home/sergiom/mosquitto_certs/mosq-serv.key")
 
-	if cert, err := tls.LoadX509KeyPair("/home/sergiom/mosquitto_certs/mosq-serv.crt", "/home/sergiom/mosquitto_certs/mosq-serv.key"); err == nil {
-		tlsConfig.Certificates = []tls.Certificate{cert}
-
-		if pemData, err := ioutil.ReadFile("/home/sergiom/mosquitto_certs/mosq-serv.crt"); err == nil {
-			if !tlsConfig.ClientCAs.AppendCertsFromPEM(pemData) {
-				logger.Fatal("Failed")
-			}
-		}
-
-		if pemData, err := ioutil.ReadFile("/home/sergiom/mosquitto_certs/mosq-ca.crt"); err == nil {
-			if !tlsConfig.RootCAs.AppendCertsFromPEM(pemData) {
-				logger.Fatal("Failed appending certs")
-			}
-		} else {
-			logger.Fatal("Failed reading CA")
-		}
-	} else {
+	if err != nil {
 		logger.Fatal("Failed loading x509 data")
 		return nil
 	}
 
+	tlsConfig := &tls.Config{
+		ClientCAs:          nil,
+		InsecureSkipVerify: true,
+		Certificates:       []tls.Certificate{cert},
+	}
+
 	opts := MQTT.NewClientOptions()
-	broker := addr.Protocol + "://" + addr.Address + ":" + strconv.Itoa(addr.Port)
+	broker := addr.Protocol + "://" + addr.Address + ":" + strconv.Itoa(addr.Port) + "/" + addr.Path
 	opts.AddBroker(broker)
 	opts.SetClientID(addr.Publisher)
 	opts.SetUsername(addr.User)

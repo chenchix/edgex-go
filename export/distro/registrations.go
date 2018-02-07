@@ -17,8 +17,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/edgexfoundry/core-domain-go/models"
-	"github.com/edgexfoundry/export-go"
+	"github.com/edgexfoundry/edgex-go/core/domain/models"
+	"github.com/edgexfoundry/edgex-go/export"
 	"go.uber.org/zap"
 )
 

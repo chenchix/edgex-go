@@ -23,8 +23,8 @@ const valueDescriptor string = `{"name":"temperature","type":"J","min":"-40","ma
 const event string = `{"origin":1471806386919,"device":"livingroomthermostat",
 		"readings":[{"origin":1471806386919,"name":"temperature","value":"{\"cosa\":\"peo\"}"}, {"origin":1471806386919,"name":"humidity","value":"-12"}]}`
 
-func isValidValueDescriptor() bool {
-	/*vd, err := dbc.ValueDescriptorByName(reading.name)
+func isValidValueDescriptor(reading model.Readings, ev models.Event) bool {
+	vd, err := dbc.ValueDescriptorByName(reading.name)
 
 	// Not an error if not found
 	if err == clients.ErrNotFound {
@@ -32,9 +32,8 @@ func isValidValueDescriptor() bool {
 	}
 
 	fmt.Println(vd)
-	*/
 
-	ev := models.Event{}
+	/*ev := models.Event{}
 
 	if err := json.Unmarshal([]byte(event), &ev); err != nil {
 		panic(err)
@@ -44,7 +43,7 @@ func isValidValueDescriptor() bool {
 
 	if err := json.Unmarshal([]byte(valueDescriptor), &vd); err != nil {
 		panic(err)
-	}
+	}*/
 
 	switch vd.Type {
 	case "B": // boolean
@@ -175,9 +174,10 @@ func validJSON(reading models.Event) bool {
 	return true
 }
 
+/*
 func main() {
 
 	t := isValidValueDescriptor()
 
 	fmt.Println("Is valid: ", t)
-}
+}*/

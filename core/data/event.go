@@ -239,6 +239,16 @@ func eventHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		if configuration.Validatecheck {
+			loggingClient.Error("Validation enabled, parsing events")
+			for i, reading := range e.Readings {
+				if !isValidValueDescriptor(reading, e) {
+					loggingClient.Error("Validation failed: "+err.Error(), "")
+					return
+				}
+			}
+		}
+
 		// Add the readings to the database
 		if configuration.Persistdata {
 			for i, reading := range e.Readings {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2018 Dell Inc.
+ * Copyright 2017 Dell Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -15,7 +15,7 @@
  * @author: Spencer Bull, Dell
  * @version: 0.5.0
  *******************************************************************************/
-package command
+package main
 
 // ConfigurationStruct : Struct used to pase the JSON configuration file
 type ConfigurationStruct struct {
@@ -54,6 +54,7 @@ type ConfigurationStruct struct {
 var configuration ConfigurationStruct = ConfigurationStruct{}
 
 const (
+	CONFIG string = "res/configuration.json"
 	/* -------------- Constants for Command -------------------- */
 	MYSERVICENAME            string = "Command"
 	REST_HTTP                string = "http://"

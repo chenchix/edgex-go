@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2018 Dell Inc.
+ * Copyright 2017 Dell Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -15,7 +15,7 @@
  * @author: Ryan Comer, Dell
  * @version: 0.5.0
  *******************************************************************************/
-package data
+package main
 
 type ConfigurationStruct struct {
 	Applicationname            string
